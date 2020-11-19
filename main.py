@@ -11,26 +11,45 @@ class imgController:
         self.imgMatrix = [[False for i in range(self.w)] for j in range(self.h)]
 
         # Converting image to black and white and adding dithering
-        img = img.convert('1')
+        # imgBW = img.convert('1')
 
         # Scribing circle based on short side of image
-        if self.w > self.h:
-            img = self.scribeCircle(img, self.h)
-        else:
-            img = self.scribeCircle(img, self.w)
+        self.scribeCircle(img, self.h)
+        self.scribeNails(img, self.h)
+        img.show()
 
         # Writing img data into img matrix
-        self.extractImgData(img, self.imgMatrix)
+        # self.extractImgData(img, self.imgMatrix)
 
         # img.show()
 
     def scribeCircle(self, img, shortSide):
         # Drawing a circle on the image from the center out
         draw = ImageDraw.Draw(img)
-        draw.ellipse((0, 0, self.w, self.h), outline="green", width=2)
+
+        # Drawing circle matching short side boarders of image
+        # first argument = (upperX, upperY, lowerX, lowerY). circle will be drawn in that bounding box 
+        draw.ellipse((0, 0, shortSide, shortSide), outline="green", width=2)
         del draw
 
-        return img
+    def scribeNails(self, img, shortSide):
+        draw = ImageDraw.Draw(img)
+        # Drawing 100 'nails' on the image
+        for i in range(100):
+            degree = round(i / 100 * 360)
+
+            xCenter = round(shortSide / 2)
+            yCenter = round(shortSide / 2)
+
+            xOff = round(np.cos(degree) * xCenter) + xCenter
+            yOff = round(np.sin(degree) * yCenter) + yCenter
+
+            draw.ellipse((xOff, yOff, xOff + 5, yOff + 5), outline="green", width=2)
+
+        print(degree, (xOff, yOff))
+
+        del draw
+
 
     # Given an image and an array matrix
     def extractImgData(self, img, mat):
